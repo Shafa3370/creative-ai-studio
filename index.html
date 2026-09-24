@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Creative AI Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef0ff;--panel:#fff;--ink:#1b1740;--mute:#5d5a80;--line:#d9dcf5;--acc:#e6318a;--acc-ink:#fff;--hi:#ffd23f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14112b;--panel:#1e1a3d;--ink:#f0eeff;--mute:#a9a5d0;--line:#332e5f;--acc:#ff5fa8;--acc-ink:#14112b;--hi:#ffd23f}}
+:root[data-theme="dark"]{--bg:#14112b;--panel:#1e1a3d;--ink:#f0eeff;--mute:#a9a5d0;--line:#332e5f;--acc:#ff5fa8;--acc-ink:#14112b;--hi:#ffd23f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "DM Sans",system-ui,sans-serif}
+h1,h2{font-family:"Bricolage Grotesque","DM Sans",system-ui,sans-serif;margin:0;line-height:1.1}
+.app{display:grid;grid-template-columns:270px 1fr;min-height:100vh;max-width:1100px;margin:0 auto}
+nav{padding:28px 18px;border-right:1px solid var(--line)}
+.brand{font:800 26px/1.05 "Bricolage Grotesque",sans-serif;margin:0 8px 22px}
+.brand span{background:var(--hi);color:#1b1740;padding:0 6px;border-radius:6px}
+nav button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:0;color:var(--ink);font:500 15px "DM Sans",sans-serif;padding:10px;border-radius:10px;cursor:pointer}
+nav button:hover{background:var(--panel)}
+nav button[aria-current="true"]{background:var(--ink);color:var(--bg)}
+nav .ic{width:24px;text-align:center}
+main{padding:32px 28px 60px}
+main h2{font-size:34px;font-weight:800}
+.sub{color:var(--mute);margin:6px 0 22px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
+label{display:block;font-weight:500;font-size:14px;margin:0 0 14px}
+input,select{display:block;width:100%;margin-top:6px;padding:10px 12px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px}
+input:focus,select:focus,button:focus-visible{outline:3px solid var(--acc);outline-offset:1px}
+.go{background:var(--acc);color:var(--acc-ink);border:0;border-radius:10px;padding:11px 20px;font:600 15px "DM Sans",sans-serif;cursor:pointer}
+.sm{background:none;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:5px 11px;font:500 13px "DM Sans",sans-serif;cursor:pointer}
+.sm:hover{border-color:var(--acc)}
+.out{margin-top:22px;display:grid;gap:12px}
+.res{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--acc);border-radius:10px;padding:14px 16px}
+.res p{margin:0 0 10px;white-space:pre-wrap}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.empty{color:var(--mute);padding:26px;border:2px dashed var(--line);border-radius:12px;text-align:center}
+.tag{font-size:12px;color:var(--mute);margin-bottom:6px}
+@media (max-width:760px){
+.app{display:block}
+nav{border-right:0;border-bottom:1px solid var(--line);padding:16px 12px 10px;overflow-x:auto}
+nav .list{display:flex;gap:6px}
+nav button{white-space:nowrap;width:auto}
+main{padding:22px 16px 50px}
+main h2{font-size:28px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<nav><div class="brand">Creative <span>AI</span> Studio</div><div class="list" id="menu"></div></nav>
+<main id="main" tabindex="-1"></main>
+</div>
+<script>
+const $=(s,r=document)=>r.querySelector(s);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+const or=(v,d)=>(v&&v.trim())?v.trim():d;
+
+const TOOLS=[
+{id:"image",ic:"🎨",name:"Image Prompt Generator",desc:"Turn a subject into detailed prompts for any image model.",
+ f:[{k:"s",l:"Subject",ph:"a lighthouse on a cliff"},{k:"st",l:"Style",o:["Photorealistic","Watercolor","3D render","Oil painting","Flat vector","Pixel art"]},{k:"m",l:"Mood",o:["Dreamy","Dramatic","Cozy","Epic","Minimal"]}],
+ g:v=>{const s=or(v.s,"a lighthouse on a cliff");return shuf(["golden hour backlight, soft haze","overcast light, muted palette","blue hour glow, long shadows","high-contrast studio lighting"]).slice(0,3).map(l=>`${s}, ${v.st.toLowerCase()} style, ${v.m.toLowerCase()} mood, ${l}, rich detail, balanced composition, ${pick(["35mm lens","wide angle","shallow depth of field"])}, high resolution`)}},
+{id:"anime",ic:"🧑",name:"Anime Style Prompt Maker",desc:"Character and scene prompts in the anime look you pick.",
+ f:[{k:"s",l:"Character",ph:"a silver-haired swordswoman"},{k:"st",l:"Genre",o:["Shonen action","Shojo romance","Fantasy adventure","Cyberpunk","Slice of life"]},{k:"p",l:"Setting",ph:"cherry blossom courtyard"}],
+ g:v=>{const s=or(v.s,"a silver-haired swordswoman"),p=or(v.p,"cherry blossom courtyard");return shuf(["dynamic low-angle pose, wind in hair","calm portrait, soft eyes, gentle smile","action frame, speed lines, dramatic sky","over-the-shoulder view, quiet moment"]).slice(0,3).map(x=>`anime illustration of ${s} in ${p}, ${v.st.toLowerCase()} aesthetic, ${x}, clean line art, cel shading, vibrant colors, detailed background`)}},
+{id:"retro",ic:"🕺",name:"Retro Photo Prompt Maker",desc:"Vintage photo prompts with era-accurate look and film grain.",
+ f:[{k:"s",l:"Subject",ph:"friends at a roller rink"},{k:"e",l:"Era",o:["1950s","1970s","1980s","1990s","Y2K"]},{k:"fi",l:"Photo format",o:["Kodachrome slide","Polaroid","Disposable camera","VHS still","Black and white film"]}],
+ g:v=>{const s=or(v.s,"friends at a roller rink");return shuf(["faded colors, light leaks","visible grain, soft focus edges","harsh flash, red-eye glow","warm cast, slight vignette"]).slice(0,3).map(x=>`${v.e} candid photo of ${s}, ${v.fi.toLowerCase()} look, ${x}, period-accurate clothing and props, authentic vintage feel`)}},
+{id:"meme",ic:"😂",name:"Meme Prompt Generator",desc:"Meme concepts with top and bottom text.",
+ f:[{k:"s",l:"Topic",ph:"Monday mornings"},{k:"t",l:"Humor",o:["Relatable","Sarcastic","Wholesome","Absurd"]}],
+ g:v=>{const s=or(v.s,"Monday mornings");const T={Relatable:[["Me: I'll be productive today","Also me: thinks about "+s],["Nobody:","Absolutely nobody:\nMe at 2am: "+s]],Sarcastic:[["Oh great, "+s,"Exactly what I needed"],["Expectation: "+s+" goes smoothly","Reality: chaos"]],Wholesome:[[s+" is tough","But you showed up, and that counts"],["Small win today:","Survived "+s]],Absurd:[["Scientists discover "+s,"is actually a raccoon in a trench coat"],["Breaking news:",s+" has learned to unionize"]]}[v.t];
+ return shuf(T).concat([[ "When "+s+" hits", "And you have no snacks"]]).slice(0,3).map(([a,b])=>`TOP: ${a}\nBOTTOM: ${b}\nImage idea: ${pick(["a confused cat at a laptop","a tired dog in a tiny hat","a stock photo person staring at the sky","a dramatic close-up of a cup of coffee"])}`)}},
+{id:"sticker",ic:"✨",name:"Sticker Pack Generator",desc:"Six matching sticker prompts for one theme.",
+ f:[{k:"s",l:"Theme or character",ph:"a sleepy corgi"},{k:"st",l:"Style",o:["Kawaii","Bold outline","Watercolor","Pixel art","Chunky 3D"]}],
+ g:v=>{const s=or(v.s,"a sleepy corgi");return shuf(["waving hello","laughing out loud","crying happy tears","holding a heart","giving a thumbs up","sending a kiss","blushing shyly","celebrating with confetti","fast asleep","sipping coffee"]).slice(0,6).map(x=>`Sticker of ${s} ${x}, ${v.st.toLowerCase()} style, thick white die-cut border, plain background, centered, consistent pack design`)}},
+{id:"cinema",ic:"🎬",name:"Cinematic Prompt Generator",desc:"Film-still prompts with lens, light and framing.",
+ f:[{k:"s",l:"Scene",ph:"a detective walks into a rainy alley"},{k:"ge",l:"Genre",o:["Noir","Sci-fi","Western","Thriller","Fantasy"]},{k:"sh",l:"Shot",o:["Wide establishing","Close-up","Tracking shot","Overhead"]}],
+ g:v=>{const s=or(v.s,"a detective walks into a rainy alley");return shuf(["anamorphic lens flare, teal and orange grade","shallow focus, practical lights in the frame","low-key lighting, deep shadows, volumetric fog","35mm film grain, muted palette"]).slice(0,3).map(x=>`Cinematic film still, ${v.sh.toLowerCase()}, ${s}, ${v.ge.toLowerCase()} atmosphere, ${x}, 2.39:1 aspect ratio`)}},
+{id:"caption",ic:"📱",name:"Social Media Caption Maker",desc:"Captions with hashtags, tuned to platform and tone.",
+ f:[{k:"s",l:"What is the post about?",ph:"my new coffee shop opening"},{k:"pl",l:"Platform",o:["Instagram","TikTok","LinkedIn","X"]},{k:"t",l:"Tone",o:["Playful","Professional","Inspiring","Witty"]}],
+ g:v=>{const s=or(v.s,"my new coffee shop opening");const w=s.split(/\s+/).filter(x=>x.length>3).slice(0,3).map(x=>"#"+x.replace(/\W/g,"").toLowerCase()).join(" ");const B={Playful:["Guess what just happened? "+s+"! 🎉","Yes, we're really doing this: "+s+". Come say hi!","Big news, tiny freakout: "+s+" ✨"],Professional:["Excited to share: "+s+". More details below.","A milestone worth noting: "+s+". Thank you for the support.","Announcement: "+s+". We'd value your feedback."],Inspiring:["Every big step starts small: "+s+".","Dream it, build it, share it: "+s+".","Proof that showing up works: "+s+"."],Witty:[s+". Plot twist: it actually happened.","Breaking: "+s+". Please clap.","Me, pretending to be calm about "+s+"."]}[v.t];
+ return B.map(b=>`${b}\n\n${w} #${v.pl.toLowerCase()} #newpost`)}}
+];
+
+let cur="image", lib=[];
+try{lib=JSON.parse(localStorage.getItem("cas-lib")||"[]")}catch(e){lib=[]}
+const saveLib=()=>{try{localStorage.setItem("cas-lib",JSON.stringify(lib))}catch(e){}};
+const el=(t,c,x)=>{const n=document.createElement(t);if(c)n.className=c;if(x!=null)n.textContent=x;return n};
+const copy=async(t,b)=>{try{await navigator.clipboard.writeText(t)}catch(e){const a=el("textarea",null,t);document.body.appendChild(a);a.select();try{document.execCommand("copy")}catch(_){}a.remove()}const o=b.textContent;b.textContent="Copied";setTimeout(()=>b.textContent=o,1200)};
+
+function menu(){const m=$("#menu");m.textContent="";
+ [...TOOLS,{id:"lib",ic:"📝",name:"Prompt Library"}].forEach(t=>{const b=el("button");b.setAttribute("aria-current",t.id===cur);const i=el("span","ic",t.ic);b.append(i,t.name);b.onclick=()=>{cur=t.id;render()};m.appendChild(b)})}
+
+function card(text,tool,lbl,box){const r=el("div","res");if(lbl)r.appendChild(el("div","tag",lbl));r.appendChild(el("p",null,text));const row=el("div","row");
+ const c=el("button","sm","Copy");c.onclick=()=>copy(text,c);row.appendChild(c);
+ if(tool){const s=el("button","sm","Save to library");s.onclick=()=>{lib.unshift({id:Date.now()+Math.random(),tool,text});saveLib();s.textContent="Saved";s.disabled=true;menu()};row.appendChild(s)}
+ else{const d=el("button","sm","Delete");d.onclick=()=>{lib=lib.filter(x=>x.text!==text||x.tool!==lbl);saveLib();render()};row.appendChild(d)}
+ r.appendChild(row);box.appendChild(r)}
+
+function render(){menu();const m=$("#main");m.textContent="";
+ if(cur==="lib"){m.append(el("h2",null,"Prompt Library"),el("p","sub","Prompts you saved on this device."));const box=el("div","out");
+  if(!lib.length)box.appendChild(el("div","empty","Nothing saved yet. Generate a prompt and choose Save to library."));
+  lib.forEach(x=>{const r=el("div","res");r.appendChild(el("div","tag",x.tool));r.appendChild(el("p",null,x.text));const row=el("div","row");
+   const c=el("button","sm","Copy");c.onclick=()=>copy(x.text,c);const d=el("button","sm","Delete");d.onclick=()=>{lib=lib.filter(y=>y.id!==x.id);saveLib();render()};row.append(c,d);r.appendChild(row);box.appendChild(r)});
+  m.appendChild(box);return}
+ const t=TOOLS.find(x=>x.id===cur);m.append(el("h2",null,t.name),el("p","sub",t.desc));
+ const c=el("div","card"),ins={};
+ t.f.forEach(f=>{const l=el("label",null,f.l);let i;if(f.o){i=el("select");f.o.forEach(o=>i.appendChild(el("option",null,o)))}else{i=el("input");i.type="text";i.placeholder=f.ph;i.onkeydown=e=>{if(e.key==="Enter")go.click()}}l.appendChild(i);c.appendChild(l);ins[f.k]=i});
+ const go=el("button","go","Generate prompts");c.appendChild(go);m.appendChild(c);
+ const out=el("div","out");out.appendChild(el("div","empty","Fill in the fields and choose Generate prompts."));m.appendChild(out);
+ go.onclick=()=>{const v={};for(const k in ins)v[k]=ins[k].value;out.textContent="";t.g(v).forEach((x,n)=>card(x,t.name,"Option "+(n+1),out))}}
+render();
+</script>
+</body>
+</html>
